@@ -2,7 +2,7 @@
   "name": "@myrotvorets/buffer-stream",
   "version": "1.1.8",
   "description": "Converts a Buffer into a Readable Stream",
-  "main": "dist/index.js",
+  "main": "dist/lib/index.js",
   "scripts": {
     "build": "tsc",
     "test": "jest",
@@ -10,12 +10,11 @@
     "lint:fix": "eslint --fix ."
   },
   "files": [
-    "dist/index.d.ts",
-    "dist/index.js",
-    "dist/index.js.map",
-    "!dist/test/"
+    "dist/lib/index.d.ts",
+    "dist/lib/index.js",
+    "dist/lib/index.js.map"
   ],
-  "typings": "dist/index.d.ts",
+  "typings": "dist/lib/index.d.ts",
   "keywords": [],
   "author": "Myrotvorets <support@myrotvorets.center> (https://myrotvorets.center/)",
   "license": "MIT",

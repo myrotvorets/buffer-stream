@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { Readable } from 'stream';
 import { promisify } from 'util';
-import { BufferStream, streamToBuffer } from '../';
+import { BufferStream, streamToBuffer } from '../lib';
 
 const error = new Error('путин - хуйло');
 const readFile = promisify(fs.readFile);
