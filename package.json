@@ -5,9 +5,11 @@
   "main": "dist/lib/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "pretest": "npm run lint",
+    "test": "jest",
+    "posttest": "npm run build"
   },
   "files": [
     "dist/lib/index.d.ts",
@@ -28,6 +30,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-sonarjs": "^0.5.0",
     "jest": "^26.5.2",
+    "jest-sonar-reporter": "^2.0.0",
     "merge": "^1.2.1",
     "prettier": "^2.1.2",
     "ts-jest": "^26.4.1",
