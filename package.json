@@ -17,7 +17,10 @@
     "dist/lib/index.js.map"
   ],
   "typings": "dist/lib/index.d.ts",
-  "keywords": [],
+  "keywords": [
+    "buffer",
+    "stream"
+  ],
   "author": "Myrotvorets <support@myrotvorets.center> (https://myrotvorets.center/)",
   "license": "MIT",
   "devDependencies": {
@@ -46,5 +49,8 @@
   "bugs": {
     "url": "https://github.com/myrotvorets/buffer-stream/issues"
   },
-  "homepage": "https://github.com/myrotvorets/buffer-stream#readme"
+  "homepage": "https://github.com/myrotvorets/buffer-stream#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }
