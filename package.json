@@ -9,7 +9,8 @@
     "lint:fix": "eslint --fix .",
     "pretest": "npm run lint",
     "test": "jest",
-    "posttest": "npm run build"
+    "posttest": "npm run build",
+    "prepare": "npm run build"
   },
   "files": [
     "dist/lib/index.d.ts",
