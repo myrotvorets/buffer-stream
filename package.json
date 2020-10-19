@@ -43,6 +43,9 @@
   },
   "dependencies": {},
   "peerDependencies": {},
+  "resolutions": {
+    "eslint": "^7.11.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/myrotvorets/buffer-stream.git"
