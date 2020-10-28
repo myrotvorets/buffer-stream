@@ -13,9 +13,4 @@ module.exports = merge.recursive(ts_preset, {
         '<rootDir>/node_modules/',
     ],
     testResultsProcessor: 'jest-sonar-reporter',
-    globals: {
-        'ts-jest': {
-            packageJson: 'package.json',
-        },
-    }
 });
