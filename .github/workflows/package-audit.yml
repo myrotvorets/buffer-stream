@@ -15,52 +15,48 @@ on:
       - package-lock.json
   workflow_dispatch:
 
+env:
+  NODE_VERSION: 14
+
 jobs:
   audit-npm:
+    name: npm Audit
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node_version: ["14"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Node.js environment
+      - name: Set up Node.js environment
         uses: actions/setup-node@v2.1.4
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Run audit
         run: npm audit --production
 
   audit-retire:
+    name: Retire.js Audit
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node_version: ["14"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          submodules: true
 
-      - name: Setup Node.js environment
+      - name: Set up Node.js environment
         uses: actions/setup-node@v2.1.4
         with:
-          node-version: ${{ matrix.node_version }}
-          registry-url: https://npm.pkg.github.com
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Cache node modules
+      - name: Cache Node modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node_version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node_version }}-
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.NODE_VERSION }}-
             ${{ runner.os }}-build-${{ env.cache-name }}-
 
       - name: Install dependencies

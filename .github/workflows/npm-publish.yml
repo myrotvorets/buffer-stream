@@ -1,45 +1,103 @@
 name: Publish Package
 
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types:
+      - released
+  workflow_dispatch:
+    inputs:
+      publish-npm:
+        default: "yes"
+        description: Publish to NPM?
+        required: true
+      publish-gpr:
+        default: "yes"
+        description: Publish to GPR?
+        required: true
+
+env:
+  NODE_VERSION: 14
 
 jobs:
-  publish:
+  prepare:
+    name: Prepare the source code
     runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.event.inputs.publish-npm == 'yes' || github.event.inputs.publish-gpr == 'yes'
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2.1.4
+      - name: Checkout source
+        uses: actions/checkout@v2
         with:
-          node-version: 12
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2.1.3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache Node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.NODE_VERSION }}-
+            ${{ runner.os }}-build-${{ env.cache-name }}-
 
       - name: Run clean install
         run: npm ci
 
-      - name: Set up Node.js and configure it for GitHub package registry
-        uses: actions/setup-node@v2.1.4
+      - name: Create tarball
+        run: npm pack
+
+      - name: Save tarball
+        uses: actions/upload-artifact@v2
         with:
-          node-version: 12
-          registry-url: https://npm.pkg.github.com/
+          name: package
+          path: "*.tgz"
+          retention-days: 1
 
-      - name: Publish to GitHub package registry
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Remove .npmrc created by actions/setup-node
-        run: rm -f "$NPM_CONFIG_USERCONFIG"
-
-      - name: Set up Node.js and configure it for npmjs package registry
-        uses: actions/setup-node@v2.1.4
+  publish-npm:
+    name: Publish to NPM package registry
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: github.event_name == 'release' || github.event.inputs.publish-npm == 'yes'
+    steps:
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2.1.3
         with:
-          node-version: 12
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: https://registry.npmjs.org/
 
-      - name: Publish to npmjs package registry
-        run: npm publish
+      - name: Download tarball
+        uses: actions/download-artifact@v2
+        with:
+          name: package
+
+      - name: Publish package
+        run: npm publish *.tgz
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-gpr:
+    name: Publish to GitHub package registry
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: github.event_name == 'release' || github.event.inputs.publish-gpr == 'yes'
+    steps:
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2.1.3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: https://npm.pkg.github.com/
+
+      - name: Download tarball
+        uses: actions/download-artifact@v2
+        with:
+          name: package
+
+      - name: Publish to GitHub package registry
+        run: npm publish *.tgz
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
