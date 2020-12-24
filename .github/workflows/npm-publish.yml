@@ -6,11 +6,11 @@ on:
       - released
   workflow_dispatch:
     inputs:
-      publish-npm:
+      npm:
         default: "yes"
         description: Publish to NPM?
         required: true
-      publish-gpr:
+      gpr:
         default: "yes"
         description: Publish to GPR?
         required: true
@@ -22,7 +22,7 @@ jobs:
   prepare:
     name: Prepare the source code
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' || github.event.inputs.publish-npm == 'yes' || github.event.inputs.publish-gpr == 'yes'
+    if: github.event_name == 'release' || github.event.inputs.npm == 'yes' || github.event.inputs.gpr == 'yes'
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -58,46 +58,37 @@ jobs:
           path: "*.tgz"
           retention-days: 1
 
-  publish-npm:
-    name: Publish to NPM package registry
+  publish:
+    name: Publish package
     runs-on: ubuntu-latest
     needs: prepare
-    if: github.event_name == 'release' || github.event.inputs.publish-npm == 'yes'
+    strategy:
+      matrix:
+        registry:
+          - npm
+          - gpr
+        include:
+          - registry: npm
+            secret: NPM_TOKEN
+            registry_url: https://registry.npmjs.org/
+          - registry: gpr
+            secret: GITHUB_TOKEN
+            registry_url: https://npm.pkg.github.com/
     steps:
       - name: Set up Node.js environment
+        if: github.event.inputs[matrix.registry] == 'yes'
         uses: actions/setup-node@v2.1.3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          registry-url: https://registry.npmjs.org/
+          registry-url: ${{ matrix.registry_url }}
 
       - name: Download tarball
+        if: github.event.inputs[matrix.registry] == 'yes'
         uses: actions/download-artifact@v2
         with:
           name: package
 
       - name: Publish package
+        if: github.event.inputs[matrix.registry] == 'yes'
         run: npm publish *.tgz
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish-gpr:
-    name: Publish to GitHub package registry
-    runs-on: ubuntu-latest
-    needs: prepare
-    if: github.event_name == 'release' || github.event.inputs.publish-gpr == 'yes'
-    steps:
-      - name: Set up Node.js environment
-        uses: actions/setup-node@v2.1.3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          registry-url: https://npm.pkg.github.com/
-
-      - name: Download tarball
-        uses: actions/download-artifact@v2
-        with:
-          name: package
-
-      - name: Publish to GitHub package registry
-        run: npm publish *.tgz
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets[matrix.secret] }}
