@@ -1,35 +1,29 @@
-name: Build and Test CI
+name: Build and Test
 
 on:
   push:
-    branches: 
-      - master
-    tags:
-      - "*"
-  pull_request:
     branches:
-      - master
+      - '**'
   workflow_dispatch:
-
-env:
-  NODE_VERSION: 14
 
 jobs:
   build:
-    name: Build and test
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[ci skip]')"
-
+    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
+    strategy:
+      matrix:
+        node:
+          - '12'
+          - '14'
+    name: Build and test (Node ${{ matrix.node }})
     steps:
       - name: Check out the code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
       - name: Set up Node.js environment
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ matrix.node }}
 
       - name: Cache Node modules
         uses: actions/cache@v2.1.4
@@ -37,61 +31,20 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.NODE_VERSION }}-
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node }}-
             ${{ runner.os }}-build-${{ env.cache-name }}-
 
-      - name: Clean install and test
-        run: npm cit
-
-      - name: Retrieve information from package.json
-        uses: myrotvorets/info-from-package-json-action@1.0.2
-        id: ver
-
-      - name: Fix paths in test-report.xml
-        run: sed -i "s@$(pwd)@/github/workspace@g" test-report.xml
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectName=${{ steps.ver.outputs.packageName }}
-            -Dsonar.projectVersion=${{ steps.ver.outputs.packageVersion }}
-            -Dsonar.links.homepage=${{ steps.ver.outputs.packageHomepage }}
-            -Dsonar.links.issue=${{ steps.ver.outputs.packageBugsUrl }}
-            -Dsonar.links.scm=${{ steps.ver.outputs.packageScmUrl }}
-        if: ${{ github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/') }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  release:
-    name: Prepare the release
-    runs-on: ubuntu-latest
-    needs: build
-    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
+      - name: Run postinstall scripts
+        run: npm rebuild && npm run prepare --if-present
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.3.4
-
-      - name: Fetch tags
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-
-      - name: Get release description
-        id: release_params
-        run: |
-          SUBJECT="$(git for-each-ref "${{ github.ref }}" --format="%(contents:subject)")"
-          BODY="$(git for-each-ref "${{ github.ref }}" --format="%(contents:body)")"
-          echo "::set-output name=subject::${SUBJECT}"
-          echo "::set-output name=body::${BODY}"
-
-      - name: Create a release
-        uses: actions/create-release@v1
+      - name: Run tests
+        run: npm test
         env:
-          GITHUB_TOKEN: ${{ secrets.REPOSITORY_ACCESS_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ steps.release_params.subject }}
-          body: ${{ steps.release_params.body }}
+          COLLECT_COVERAGE: "0"

@@ -3,60 +3,61 @@ name: Package Audit
 on:
   push:
     branches:
-      - master
+      - '**'
     paths:
       - package.json
       - package-lock.json
-  pull_request:
-    branches:
-      - master
-    paths:
-      - package.json
-      - package-lock.json
+      - .github/workflows/package-audit.yml
   workflow_dispatch:
-
-env:
-  NODE_VERSION: 14
 
 jobs:
   audit-npm:
-    name: npm Audit
+    name: NPM Audit
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: ["14"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Node.js environment
+      - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ matrix.node_version }}
 
       - name: Run audit
         run: npm audit --production
 
   audit-retire:
-    name: Retire.js Audit
+    name: RetireJS Check
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node_version: ["14"]
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          submodules: true
 
-      - name: Set up Node.js environment
+      - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ matrix.node_version }}
+          registry-url: https://npm.pkg.github.com
 
-      - name: Cache Node modules
+      - name: Cache node modules
         uses: actions/cache@v2.1.4
         env:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node_version }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.NODE_VERSION }}-
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node_version }}-
             ${{ runner.os }}-build-${{ env.cache-name }}-
 
       - name: Install dependencies
