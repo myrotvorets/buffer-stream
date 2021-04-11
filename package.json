@@ -1,6 +1,6 @@
 {
   "name": "@myrotvorets/buffer-stream",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Converts a Buffer into a Readable Stream",
   "main": "dist/lib/index.js",
   "scripts": {
