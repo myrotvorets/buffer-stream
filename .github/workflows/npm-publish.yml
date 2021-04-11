@@ -80,6 +80,15 @@ jobs:
             secret: GITHUB_TOKEN
             registry_url: https://npm.pkg.github.com/
     steps:
+      - name: Set commit status to PENDING
+        uses: myrotvorets/set-commit-status-action@1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: pending
+          context: Publish to ${{ matrix.registry }}
+          sha: ${{ github.sha }}
+        if: github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release'
+
       - name: Set up Node.js environment
         if: github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release'
         uses: actions/setup-node@v2.1.5
@@ -97,3 +106,12 @@ jobs:
         run: npm publish *.tgz
         env:
           NODE_AUTH_TOKEN: ${{ secrets[matrix.secret] }}
+
+      - name: Set final commit status
+        uses: myrotvorets/set-commit-status-action@1.0.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          context: Publish to ${{ matrix.registry }}
+          sha: ${{ github.sha }}
+        if: always() && (github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release')
