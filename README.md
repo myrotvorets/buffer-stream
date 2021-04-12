@@ -20,3 +20,4 @@ const stream = new BufferStream(buf);
 // streamToBuffer
 streamToBuffer(stream).then((buffer) => { /* ... */ })
 ```
+
