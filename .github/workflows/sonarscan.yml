@@ -6,6 +6,9 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  SONARSCANNER: "true"
+
 jobs:
   build:
     name: SonarCloud Scan
