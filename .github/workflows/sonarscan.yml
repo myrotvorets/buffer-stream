@@ -4,20 +4,25 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 env:
+  NODE_VERSION: "14"
   SONARSCANNER: "true"
 
 jobs:
   build:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
-    env:
-      NODE_VERSION: '14'
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && github.event.sender.login != 'dependabot[bot]' ||
+      !contains(github.event.head_commit.message, '[ci skip]')
     steps:
-      - name: Check out the code
+      - name: Check out the source code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
