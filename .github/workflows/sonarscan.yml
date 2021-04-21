@@ -2,7 +2,7 @@ name: SonarCloud Analysis
 
 on:
   push:
-    branches: 
+    branches:
       - master
   workflow_dispatch:
 
@@ -55,7 +55,7 @@ jobs:
           COLLECT_COVERAGE: "1"
 
       - name: Retrieve information from package.json
-        uses: myrotvorets/info-from-package-json-action@1.0.3
+        uses: myrotvorets/info-from-package-json-action@1.0.4
         id: ver
 
       - name: Fix paths in test-report.xml
