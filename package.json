@@ -10,7 +10,7 @@
     "pretest": "npm run lint",
     "test": "jest",
     "posttest": "npm run build",
-    "pack": "npm run build"
+    "prepack": "npm run build"
   },
   "files": [
     "dist/lib/*.d.ts",
