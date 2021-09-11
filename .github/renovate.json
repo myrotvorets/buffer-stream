@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "config:base",
+    ":preserveSemverRanges",
+    ":separateMultipleMajorReleases",
+    ":combinePatchMinorReleases",
+    ":rebaseStalePrs",
+    ":prConcurrentLimitNone",
+    ":disableRateLimiting",
+    ":automergeMinor",
+    ":automergePr",
+    ":automergeRequireAllStatusChecks",
+    ":automergeLinters",
+    ":automergeTesters",
+    ":automergeTypes",
+    ":enableVulnerabilityAlerts",
+    ":widenPeerDependencies",
+    ":semanticCommits"
+  ]
+}
