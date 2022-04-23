@@ -4,11 +4,17 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "lib/**.ts"
+      - ".github/workflows/codeql-analysis.yml"
   pull_request:
     branches:
       - master
+    paths:
+      - "lib/**.ts"
+      - ".github/workflows/codeql-analysis.yml"
   schedule:
-    - cron: '0 8 * * 6'
+    - cron: '24 2 * * 6'
 
 permissions:
   actions: read
@@ -27,8 +33,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
-        with:
-          fetch-depth: 2
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
