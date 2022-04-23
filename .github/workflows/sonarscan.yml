@@ -9,8 +9,12 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 env:
   SONARSCANNER: "true"
+  COLLECT_COVERAGE: "1"
 
 jobs:
   build:
@@ -42,11 +46,9 @@ jobs:
 
       - name: Run tests
         run: npm test
-        env:
-          COLLECT_COVERAGE: "1"
 
       - name: Retrieve information from package.json
-        uses: myrotvorets/info-from-package-json-action@707c49e5757ac29e396e94b18e43b85a53ec0b3b # renovate: tag=1.1.0
+        uses: myrotvorets/info-from-package-json-action@707c49e5757ac29e396e94b18e43b85a53ec0b3b # tag=1.1.0
         id: ver
 
       - name: Fix paths in test-report.xml
