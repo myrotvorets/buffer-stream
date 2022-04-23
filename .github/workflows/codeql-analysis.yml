@@ -1,0 +1,38 @@
+name: CodeQL Analysis
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: '0 8 * * 6'
+
+jobs:
+  analyze:
+    name: Static Code Analysis with CodeQL
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language:
+          - javascript
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
+        with:
+          fetch-depth: 2
+
+      - run: git checkout HEAD^2
+        if: ${{ github.event_name == 'pull_request' }}
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@d39d5d5c9707b926d517b1b292905ef4c03aa777 # tag=v1.1.2
+        with:
+          languages: ${{ matrix.language }}
+          config-file: ./.github/codeql-config.yml
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@d39d5d5c9707b926d517b1b292905ef4c03aa777 # tag=v1.1.2
