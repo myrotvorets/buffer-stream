@@ -20,38 +20,12 @@ permissions:
 
 jobs:
   prepare:
-    name: Prepare the source code
+    name: Prepare source code
     runs-on: ubuntu-latest
     if: github.event_name == 'release' || github.event.inputs.npm == 'yes' || github.event.inputs.gpr == 'yes'
     steps:
-      - name: Checkout source
-        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3.0.2
-        with:
-          ref: ${{ github.event.release.tag_name }}
-
-      - name: Set up Node.js environment
-        uses: actions/setup-node@eeb10cff27034e7acf239c5d29f62154018672fd # tag=v3.3.0
-        with:
-          node-version: 'lts/*'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run postinstall scripts
-        run: npm rebuild && npm run prepare --if-present
-
-      - name: Create tarball
-        run: npm pack
-
-      - name: Save tarball
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # tag=v3
-        with:
-          name: package
-          path: "*.tgz"
-          retention-days: 1
+      - name: Prepare source
+        uses: myrotvorets/composite-actions/node-prepublish@master
 
   publish:
     name: Publish package (${{ matrix.registry }})
@@ -73,39 +47,9 @@ jobs:
             secret: GITHUB_TOKEN
             registry_url: https://npm.pkg.github.com/
     steps:
-      - name: Set commit status to PENDING
-        uses: myrotvorets/set-commit-status-action@5b39333f62641d4fe9c0967572f738a4aea8a15b # renovate: tag=1.1.4
+      - name: Prepare source
+        uses: myrotvorets/composite-actions/node-publish@master
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          status: pending
-          context: Publish to ${{ matrix.registry }}
-          sha: ${{ github.sha }}
-        if: github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release'
-
-      - name: Set up Node.js environment
-        if: github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release'
-        uses: actions/setup-node@eeb10cff27034e7acf239c5d29f62154018672fd # tag=v3.3.0
-        with:
+          node-auth-token: ${{ secrets[matrix.secret] }}
           registry-url: ${{ matrix.registry_url }}
-          node-version: 'lts/*'
-
-      - name: Download tarball
         if: github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release'
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # tag=v3
-        with:
-          name: package
-
-      - name: Publish package
-        if: github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release'
-        run: npm publish *.tgz
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets[matrix.secret] }}
-
-      - name: Set final commit status
-        uses: myrotvorets/set-commit-status-action@5b39333f62641d4fe9c0967572f738a4aea8a15b # renovate: tag=1.1.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ job.status }}
-          context: Publish to ${{ matrix.registry }}
-          sha: ${{ github.sha }}
-        if: always() && (github.event.inputs[matrix.registry] == 'yes' || github.event_name == 'release')
