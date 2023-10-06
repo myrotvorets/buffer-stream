@@ -8,6 +8,7 @@ export class WritableBufferStream extends Writable {
         if (Buffer.isBuffer(chunk)) {
             buf = chunk;
         } else if (chunk !== undefined && chunk !== null) {
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
             buf = Buffer.from(`${chunk}`, encoding);
         }
 
