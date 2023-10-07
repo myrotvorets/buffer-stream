@@ -1,9 +1,9 @@
-import { Writable } from 'stream';
+import { Writable } from 'node:stream';
 
 export class WritableBufferStream extends Writable {
     private _buffer: Buffer | null = null;
 
-    public _write(chunk: unknown, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+    public override _write(chunk: unknown, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
         let buf: Buffer | undefined;
         if (Buffer.isBuffer(chunk)) {
             buf = chunk;
@@ -42,7 +42,7 @@ export class WritableBufferStream extends Writable {
         this._buffer = null;
     }
 
-    public toString(): string {
+    public override toString(): string {
         return this._buffer ? this._buffer.toString() : '';
     }
 }

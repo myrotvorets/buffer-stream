@@ -1,11 +1,11 @@
-import { createReadStream, promises } from 'fs';
-import { Readable } from 'stream';
+import { createReadStream, promises } from 'node:fs';
+import { Readable } from 'node:stream';
 import { streamToBuffer } from '../lib';
 
 const error = new Error('путин - хуйло');
 
 class FailingStream extends Readable {
-    public _read(): void {
+    public override _read(): void {
         this.emit('error', error);
     }
 }

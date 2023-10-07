@@ -1,4 +1,4 @@
-import { Readable } from 'stream';
+import { Readable } from 'node:stream';
 
 export class BufferStream extends Readable {
     private _buffer: Buffer | null;
@@ -8,7 +8,7 @@ export class BufferStream extends Readable {
         this._buffer = buffer;
     }
 
-    public _read(): void {
+    public override _read(): void {
         this.push(this._buffer);
         this._buffer = null;
     }
