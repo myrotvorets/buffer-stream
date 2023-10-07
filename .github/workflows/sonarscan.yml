@@ -12,10 +12,6 @@ on:
 permissions:
   contents: read
 
-env:
-  SONARSCANNER: "true"
-  COLLECT_COVERAGE: "1"
-
 jobs:
   build:
     name: SonarCloud Scan
@@ -29,3 +25,5 @@ jobs:
         uses: myrotvorets/composite-actions/node-sonarscan@master
         with:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
+          test-script: 'test:coverage'
+

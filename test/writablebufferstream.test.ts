@@ -1,47 +1,51 @@
+import { expect } from 'chai';
 import { WritableBufferStream } from '../lib';
 
-describe('WritableBufferStream', (): void => {
-    it.each([true, false])(
-        'should pass the basic test (decodeStrings is %s)',
-        async (decodeStrings: boolean): Promise<unknown> => {
+describe('WritableBufferStream', function (): void {
+    // eslint-disable-next-line mocha/no-setup-in-describe
+    [true, false].forEach((decodeStrings) =>
+        it(`should pass the basic test (decodeStrings is ${decodeStrings})`, async function () {
             const stream = new WritableBufferStream({ decodeStrings });
             const expected = 'test';
 
             await stream.writeP(expected);
-            return expect(stream.toString()).toStrictEqual(expected);
-        },
+            return expect(stream.toString()).to.equal(expected);
+        }),
     );
 
-    it.each([true, false])('should concat multiple buffers correctly (decodeStrings is %s)', async (decodeStrings) => {
-        const data = ['This ', 'is ', 'a ', 'test'];
-        const expected = data.join('');
-        const stream = new WritableBufferStream({ decodeStrings });
+    // eslint-disable-next-line mocha/no-setup-in-describe
+    [true, false].forEach((decodeStrings) =>
+        it(`should concat multiple buffers correctly (decodeStrings is ${decodeStrings})`, async function () {
+            const data = ['This ', 'is ', 'a ', 'test'];
+            const expected = data.join('');
+            const stream = new WritableBufferStream({ decodeStrings });
 
-        for (const chunk of data) {
-            // eslint-disable-next-line no-await-in-loop
-            await stream.writeP(chunk, 'ascii');
-        }
+            for (const chunk of data) {
+                // eslint-disable-next-line no-await-in-loop
+                await stream.writeP(chunk, 'ascii');
+            }
 
-        return expect(stream.toString()).toStrictEqual(expected);
-    });
+            return expect(stream.toString()).to.equal(expected);
+        }),
+    );
 
-    it('should delete the buffer on clear()', async () => {
+    it('should delete the buffer on clear()', async function () {
         const stream = new WritableBufferStream();
         const expected = 'test';
 
         await stream.writeP(expected);
-        expect(stream.toString()).toStrictEqual(expected);
+        expect(stream.toString()).to.equal(expected);
 
         stream.clear();
-        expect(stream.toString()).toStrictEqual('');
+        expect(stream.toString()).to.equal('');
     });
 
     // Attempt to write a `null` will result in `TypeError [ERR_STREAM_NULL_VALUES]: May not write null values to stream`
-    it('should ignore write(undefined)', async () => {
+    it('should ignore write(undefined)', async function () {
         const stream = new WritableBufferStream({ decodeStrings: false, objectMode: true });
         const expected = '';
 
         await stream.writeP(undefined);
-        return expect(stream.toString()).toStrictEqual(expected);
+        return expect(stream.toString()).to.equal(expected);
     });
 });

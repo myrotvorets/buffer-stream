@@ -22,7 +22,7 @@ export class WritableBufferStream extends Writable {
     public writeP(chunk: unknown, encoding?: BufferEncoding): Promise<void> {
         return new Promise((resolve, reject) => {
             const callback = (err?: Error | null): void => {
-                // istanbul ignore if
+                /* c8 ignore next 2 */
                 if (err) {
                     reject(err);
                 } else {
