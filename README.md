@@ -6,9 +6,9 @@
 
 Converts a Buffer into a Readable Stream.
 
-Since 1.1.0 provides a helper to read the entire stream into a Buffer.
+Since version 1.1.0, it provides a helper to read the entire stream into a Buffer.
 
-Since 1.3.0 provides a writable stream that stores the result in a buffer.
+Since version 1.3.0, it provides a writable stream that stores the result in a buffer.
 
 ## Usage
 
@@ -35,4 +35,4 @@ stream.write('something', (err) => {
 await stream.writeP('something else');
 ```
 
-See the `test` directory for usage examples.
+See the [`test`](test) directory for usage examples.
