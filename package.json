@@ -25,7 +25,7 @@
   "author": "Myrotvorets <support@myrotvorets.center> (https://myrotvorets.center/)",
   "license": "MIT",
   "devDependencies": {
-    "@myrotvorets/eslint-config-myrotvorets-ts": "^2.22.3",
+    "@myrotvorets/eslint-config-myrotvorets-ts": "^2.22.4",
     "@types/chai": "^4.3.7",
     "@types/chai-as-promised": "^7.1.6",
     "@types/mocha": "^10.0.2",
