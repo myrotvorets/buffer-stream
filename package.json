@@ -51,6 +51,7 @@
   },
   "homepage": "https://github.com/myrotvorets/buffer-stream#readme",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   }
 }
