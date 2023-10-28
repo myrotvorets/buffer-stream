@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { WritableBufferStream } from '../lib';
 
 describe('WritableBufferStream', function (): void {
-    it('should have the initial buffer as null', function() {
+    it('should have the initial buffer as null', function () {
         const stream = new WritableBufferStream();
         expect(stream.buffer).to.be.null;
     });
