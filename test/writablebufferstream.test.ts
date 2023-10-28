@@ -2,6 +2,11 @@ import { expect } from 'chai';
 import { WritableBufferStream } from '../lib';
 
 describe('WritableBufferStream', function (): void {
+    it('should have the initial buffer as null', function() {
+        const stream = new WritableBufferStream();
+        expect(stream.buffer).to.be.null;
+    });
+
     // eslint-disable-next-line mocha/no-setup-in-describe
     [true, false].forEach((decodeStrings) =>
         it(`should pass the basic test (decodeStrings is ${decodeStrings})`, async function () {

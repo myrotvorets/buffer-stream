@@ -9,7 +9,7 @@ export class WritableBufferStream extends Writable {
             buf = chunk;
         } else if (chunk !== undefined && chunk !== null) {
             // eslint-disable-next-line @typescript-eslint/no-base-to-string
-            buf = Buffer.from(`${chunk}`, encoding);
+            buf = Buffer.from(`${chunk}`, encoding); // NOSONAR
         }
 
         if (buf) {
@@ -42,7 +42,11 @@ export class WritableBufferStream extends Writable {
         this._buffer = null;
     }
 
-    public override toString(): string {
-        return this._buffer ? this._buffer.toString() : '';
+    public override toString(encoding?: BufferEncoding): string {
+        return this._buffer ? this._buffer.toString(encoding) : '';
+    }
+
+    public get buffer(): Buffer | null {
+        return this._buffer;
     }
 }
