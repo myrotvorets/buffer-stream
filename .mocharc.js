@@ -1,7 +1,8 @@
 module.exports = {
     recursive: true,
     extension: ['.test.ts'],
-    require: 'mocha.setup.js',
+    'node-option': ['loader=ts-node/esm', 'no-warnings'],
+    require: ['chai/register-expect.js', 'ts-node/register'],
     reporter: 'mocha-multi',
     'reporter-option': [
         'spec=-',
