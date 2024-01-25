@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { WritableBufferStream } from '../lib';
+import { WritableBufferStream } from '../lib/index';
 
 describe('WritableBufferStream', function (): void {
     it('should have the initial buffer as null', function () {
