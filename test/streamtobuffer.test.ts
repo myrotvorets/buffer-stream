@@ -17,7 +17,7 @@ describe('streamToBuffer', function () {
         const stream = new FailingStream();
         return streamToBuffer(stream).then(
             () => expect.fail('should not resolve'),
-            (err) => expect(err).to.equal(error),
+            (err: unknown) => expect(err).to.equal(error),
         );
     });
 

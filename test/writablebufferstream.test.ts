@@ -3,6 +3,7 @@ import { WritableBufferStream } from '../lib/index';
 describe('WritableBufferStream', function (): void {
     it('should have the initial buffer as null', function () {
         const stream = new WritableBufferStream();
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         expect(stream.buffer).to.be.null;
     });
 
