@@ -25,46 +25,9 @@ jobs:
           allowed-endpoints:
             api.github.com:443
             github.com:443
+            objects.githubusercontent.com:443
+            nodejs.org:443
             registry.npmjs.org:443
 
       - name: Audit with NPM
         uses: myrotvorets/composite-actions/node-package-audit@master
-
-  provenance:
-    name: Verify signatures and provenance statements
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
-        with:
-          disable-sudo: true
-          allowed-endpoints:
-            api.github.com:443
-            github.com:443
-            registry.npmjs.org:443
-            tuf-repo-cdn.sigstore.dev:443
-
-      - name: Checkout
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
-        with:
-          node-version: lts/*
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update npm
-        run: npm i -g npm
-
-      - name: Run audit
-        run: npm audit signatures
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
