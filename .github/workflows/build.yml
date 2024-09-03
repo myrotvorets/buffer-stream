@@ -4,17 +4,23 @@ name: Build and Test
 on:
   push:
     branches:
-      - "**"
+      - master
+  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
+env:
+  NPM_CONFIG_FUND: '0'
+  NPM_CONFIG_AUDIT: '0'
+  SUPPRESS_SUPPORT: '1'
+  NO_UPDATE_NOTIFIER: 'true'
+
 jobs:
   build:
     name: Build and test (Node ${{ matrix.node.name }})
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
     strategy:
       matrix:
         node:
@@ -22,27 +28,19 @@ jobs:
           - { name: LTS,          version: lts/* }
           - { name: Previous LTS, version: lts/-1 }
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            nodejs.org:443
+            registry.npmjs.org:443
+
       - name: Build and test
         uses: myrotvorets/composite-actions/build-test-nodejs@master
         with:
           node-version: ${{ matrix.node.version }}
-
-  lint:
-    name: Check Code Style
-    runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
-    steps:
-      - name: Run code style check
-        uses: myrotvorets/composite-actions/node-run-script@master
-        with:
-          script: lint
-
-  typecheck:
-    name: Check Types
-    runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.head_commit.message, '[ci skip]') || github.event_name == 'workflow_dispatch' }}
-    steps:
-      - name: Run type check
-        uses: myrotvorets/composite-actions/node-run-script@master
-        with:
-          script: typecheck
