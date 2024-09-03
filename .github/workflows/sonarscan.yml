@@ -12,6 +12,9 @@ on:
 permissions:
   contents: read
 
+env:
+  SONARSCANNER: 'true'
+
 jobs:
   build:
     name: SonarCloud Scan
