@@ -41,6 +41,6 @@ jobs:
             registry.npmjs.org:443
 
       - name: Build and test
-        uses: myrotvorets/composite-actions/build-test-nodejs@master
+        uses: myrotvorets/composite-actions/build-test-nodejs@931ae3fec4810f7d263d28f6cf12159080b76208
         with:
           node-version: ${{ matrix.node.version }}
