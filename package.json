@@ -29,7 +29,7 @@
     "@myrotvorets/eslint-config-myrotvorets-ts": "^3.0.0",
     "@types/node": "^24.0.0",
     "c8": "^10.1.2",
-    "eslint-formatter-gha": "^1.5.1",
+    "eslint-formatter-gha": "^2.0.0",
     "node-reporter-gha": "^2.0.4",
     "node-reporter-sonarqube": "^1.0.1",
     "ts-node": "^10.9.2",
